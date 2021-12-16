@@ -2,12 +2,12 @@
 
 namespace App\Console;
 
+use App\Helpers\Messaging;
 use App\Models\Recipient;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Storage;
 use VK\Client\VKApiClient;
 
 class Kernel extends ConsoleKernel
@@ -24,13 +24,12 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $vk = new VKApiClient("5.131");
             $message = "Проверка отправки сообщений";
-            if (Storage::exists("last_send.txt") && Storage::exists("messaging_time.txt")) {
-                $last_send = (int)Storage::get("last_send.txt");
-                $messaging = (int)Storage::get("messaging_time.txt");
-                if ($messaging <= 0 || $last_send + $messaging * 60 - 15 < Carbon::now()->timestamp) {
-                    return;
-                }
-            } else {
+
+            $data = Messaging::get();
+
+            $next = $data["next"];
+            $interval = $data["interval"];
+            if ($interval <= 0 || $next - 15 > Carbon::now()->timestamp) {
                 return;
             }
             $list = Recipient::all();
@@ -43,6 +42,7 @@ class Kernel extends ConsoleKernel
                 ]);
                 sleep(2);
             }
+            Messaging::update(Carbon::now()->timestamp + $interval * 60);
         })->everyMinute()->name('messaging')->withoutOverlapping();
     }
 

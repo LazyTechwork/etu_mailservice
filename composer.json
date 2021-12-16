@@ -12,7 +12,8 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "vkcom/vk-php-sdk": "^5.101",
-        "laravel/envoy": "^2.7"
+        "laravel/envoy": "^2.7",
+        "ext-json": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

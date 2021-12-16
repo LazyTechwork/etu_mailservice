@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Messaging;
 use App\Models\Recipient;
 use Exception;
 use Illuminate\Http\Request;
@@ -47,32 +48,31 @@ class RecipientController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => 'time is required to be integer of range 1-12000'], 400);
         }
-        if (Storage::exists('messaging_time.txt.disabled')) {
-            Storage::put('messaging_time.txt.disabled', $request->get("time"));
-        } else {
-            Storage::put('messaging_time.txt', $request->get("time"));
+        try {
+            Messaging::update(null, (int)$request->get("time"));
+        } catch (\JsonException $_) {
+            return response()->json(['status' => 'error', 'message' => 'Cannot write to JSON'], 500);
         }
-
         return response()->json(['status' => 'ok']);
     }
 
     public function disableMessaging()
     {
-        if (!Storage::exists('messaging_time.txt.disabled') && Storage::exists('messaging_time.txt')) {
-            Storage::move('messaging_time.txt', 'messaging_time.txt.disabled');
+        try {
+            Messaging::update(null, null, true);
+        } catch (\JsonException $_) {
+            return response()->json(['status' => 'error', 'message' => 'Cannot write to JSON'], 500);
         }
-
         return response()->json(['status' => 'ok']);
     }
 
     public function enableMessaging()
     {
-        if (Storage::exists('messaging_time.txt.disabled')) {
-            Storage::move('messaging_time.txt.disabled', 'messaging_time.txt');
-        } else if (Storage::exists('messaging_time.txt')) {
-            Storage::put('messaging_time.txt', '5');
+        try {
+            Messaging::update(null, null, false);
+        } catch (\JsonException $_) {
+            return response()->json(['status' => 'error', 'message' => 'Cannot write to JSON'], 500);
         }
-
         return response()->json(['status' => 'ok']);
     }
 
