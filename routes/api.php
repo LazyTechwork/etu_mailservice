@@ -21,3 +21,4 @@ Route::get("/enable", [RecipientController::class, 'enableMessaging']);
 Route::get("/list", [RecipientController::class, 'messagingList']);
 Route::get("/add", [RecipientController::class, 'addToMessagingList']);
 Route::get("/remove", [RecipientController::class, 'removeFromMessagingList']);
+Route::get("/status", [RecipientController::class, 'status']);

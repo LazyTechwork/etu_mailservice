@@ -24,7 +24,13 @@ class RecipientController extends Controller
         $event = $request->header("X-GitHub-Event");
         $ref = $request->get("ref");
         $pushed = $event === "push" && $ref === "refs/heads/master";
-
+        $githubHash = $request->header('X-Hub-Signature');
+        $localToken = config('app.deploy_secret');
+        $githubPayload = $request->getContent();
+        $localHash = 'sha1=' . hash_hmac('sha1', $githubPayload, $localToken, false);
+        if (!hash_equals($githubHash, $localHash)) {
+            return response()->json(['status' => 'error', 'exception' => 'Cannot validate secret']);
+        }
         try {
             $this->vk->messages()->send(Config::get("app.vk_token"), [
                 "peer_id"   => 242521347,
@@ -106,5 +112,10 @@ class RecipientController extends Controller
         $recipient = Recipient::whereId($request->get('id'))->delete();
 
         return response()->json(['status' => 'ok', 'recipient' => $recipient]);
+    }
+
+    public function status()
+    {
+        return response()->json(Messaging::get());
     }
 }

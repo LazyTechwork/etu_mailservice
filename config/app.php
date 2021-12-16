@@ -26,8 +26,9 @@ return [
     |
     */
 
-    'env'      => env('APP_ENV', 'production'),
-    'vk_token' => env('VK_TOKEN'),
+    'env'           => env('APP_ENV', 'production'),
+    'vk_token'      => env('VK_TOKEN'),
+    'deploy_secret' => env('APP_DEPLOY_SECRET'),
 
     /*
     |--------------------------------------------------------------------------
