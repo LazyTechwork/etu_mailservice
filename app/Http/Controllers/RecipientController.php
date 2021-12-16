@@ -20,17 +20,18 @@ class RecipientController extends Controller
 
     public function github(Request $request)
     {
-        $event = $request->get("event");
-        $payload = $request->get("payload");
-        $pushed = $event === "push" && $payload["ref"] === "refs/heads/main";
+        $event = $request->header("X-GitHub-Event");
+        $ref = $request->get("ref");
+        $pushed = $event === "push" && $ref === "refs/heads/main";
 
         try {
             $this->vk->messages()->send(Config::get("app.vk_token"), [
-                "peer_id" => 242521347,
-                "message" => "Got GH event! ${event}. Pushed? ${pushed}"
+                "peer_id"   => 242521347,
+                "message"   => "Got GH event! $event. Pushed? $pushed",
+                "random_id" => random_int(0, PHP_INT_MAX)
             ]);
         } catch (Exception $e) {
-            return response()->json($e, 500);
+            return response()->json(['status' => 'error', 'exception' => $e->getMessage()]);
         }
 
         if ($pushed) {
