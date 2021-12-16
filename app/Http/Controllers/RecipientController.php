@@ -7,7 +7,7 @@ use App\Models\Recipient;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Process;
 use VK\Client\VKApiClient;
 
 class RecipientController extends Controller
@@ -23,23 +23,30 @@ class RecipientController extends Controller
     {
         $event = $request->header("X-GitHub-Event");
         $ref = $request->get("ref");
-        $pushed = $event === "push" && $ref === "refs/heads/main";
+        $pushed = $event === "push" && $ref === "refs/heads/master";
 
         try {
             $this->vk->messages()->send(Config::get("app.vk_token"), [
                 "peer_id"   => 242521347,
-                "message"   => "Got GH event! $event. Pushed? $pushed",
+                "message"   => "Got GH event! $event. Pushed? " . ($pushed ? "yes" : "no"),
                 "random_id" => random_int(0, PHP_INT_MAX)
             ]);
         } catch (Exception $e) {
             return response()->json(['status' => 'error', 'exception' => $e->getMessage()]);
         }
 
+        $output = [];
         if ($pushed) {
-            exec("./vendor/bin/envoy run deploy >> /dev/null");
+            $envoy = new Process([base_path() . "/vendor/bin/envoy", "run", "deploy"]);
+            $envoy->run();
+            if (!$envoy->isSuccessful()) {
+                $output = $envoy->getErrorOutput();
+            } else {
+                $output = $envoy->getOutput();
+            }
         }
 
-        return response('Got it!', 200);
+        return response()->json(['status' => 'ok', 'console' => $output]);
     }
 
     public function changeMessagingTime(Request $request)

@@ -1,10 +1,15 @@
 @servers(['localhost' => '127.0.0.1'])
 
 @task('deploy')
-cd /var/www/etu_mailservice
+cd {{ base_path() }}
 php artisan down --refresh=30
-git pull origin master
+git fetch --all
+git reset --hard origin/master
 composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --optimize-autoloader
 php artisan migrate --force
 php artisan up
 @endtask
+
+@finished
+@telegram('5058258557:AAGhTrmOsbs8AuDA3KoWoGvsmNsbArocydA', '229341720')
+@endfinished
