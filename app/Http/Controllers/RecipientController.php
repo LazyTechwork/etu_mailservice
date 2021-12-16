@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Recipient;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use VK\Client\VKApiClient;
 
@@ -24,7 +25,7 @@ class RecipientController extends Controller
         $pushed = $event === "push" && $payload["ref"] === "refs/heads/main";
 
         try {
-            $this->vk->messages()->send(env("VK_TOKEN"), [
+            $this->vk->messages()->send(Config::get("app.vk_token"), [
                 "peer_id" => 242521347,
                 "message" => "Got GH event! ${event}. Pushed? ${pushed}"
             ]);

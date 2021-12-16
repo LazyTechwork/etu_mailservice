@@ -6,6 +6,7 @@ use App\Models\Recipient;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use VK\Client\VKApiClient;
 
@@ -35,7 +36,7 @@ class Kernel extends ConsoleKernel
             $list = Recipient::all();
             $list = $list->chunk(100);
             foreach ($list as $item) {
-                $vk->messages()->send(env("VK_TOKEN"), [
+                $vk->messages()->send(Config::get("app.vk_token"), [
                     'ids'     => array_map(static function ($i) { return $i['vk']; }, $item),
                     'message' => $message
                 ]);
