@@ -99,9 +99,11 @@ class RecipientController extends Controller
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => 'vk should contain eligible vk id'], 400);
         }
-        $created = Recipient::create(['vk' => $request->get('vk')]);
-
-        return response()->json(['status' => 'ok', 'recipient' => $created]);
+        if(!Recipient::whereVk($request->get('vk'))->exists()) {
+            $created = Recipient::create(['vk' => $request->get('vk')]);
+            return response()->json(['status' => 'ok', 'recipient' => $created]);
+        }
+        return response()->json(['status' => 'ok', 'message' => 'Already in database']);
     }
 
     public function removeFromMessagingList(Request $request)
