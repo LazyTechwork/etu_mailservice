@@ -7,4 +7,5 @@ composer install --no-ansi --no-dev --prefer-dist --no-interaction --no-plugins 
 php artisan migrate --force
 php artisan cache:clear
 php artisan config:cache
+chmod +x ./deploy.sh
 php artisan up
