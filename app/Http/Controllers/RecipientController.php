@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Messaging;
 use App\Models\Recipient;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -79,7 +80,7 @@ class RecipientController extends Controller
     public function enableMessaging()
     {
         try {
-            Messaging::update(null, null, false);
+            Messaging::update(Carbon::now()->timestamp + 60 * Messaging::get()['interval'], null, false);
         } catch (\JsonException $_) {
             return response()->json(['status' => 'error', 'message' => 'Cannot write to JSON'], 500);
         }
