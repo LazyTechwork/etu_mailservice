@@ -6,8 +6,8 @@ use App\Helpers\Messaging;
 use App\Models\Recipient;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
-use Symfony\Component\Process\Process;
 use VK\Client\VKApiClient;
 
 class RecipientController extends Controller
@@ -34,19 +34,8 @@ class RecipientController extends Controller
         } catch (Exception $e) {
             return response()->json(['status' => 'error', 'exception' => $e->getMessage()]);
         }
-
-        $output = [];
-        if ($pushed) {
-            $envoy = new Process([base_path() . "/vendor/bin/envoy", "run", "deploy"]);
-            $envoy->run();
-            if (!$envoy->isSuccessful()) {
-                $output = $envoy->getErrorOutput();
-            } else {
-                $output = $envoy->getOutput();
-            }
-        }
-
-        return response()->json(['status' => 'ok', 'console' => $output]);
+        Artisan::call("deploy");
+        return response()->json(['status' => 'ok']);
     }
 
     public function changeMessagingTime(Request $request)
