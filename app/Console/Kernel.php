@@ -27,6 +27,10 @@ class Kernel extends ConsoleKernel
 
             $data = Messaging::get();
 
+            if ($data["disabled"]) {
+                return;
+            }
+
             $next = $data["next"];
             $interval = $data["interval"];
             if ($interval <= 0 || $next - 15 > Carbon::now()->timestamp) {
