@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get("/github", [RecipientController::class, 'github']);
+Route::post("/github", [RecipientController::class, 'github']);
 Route::get("/change", [RecipientController::class, 'changeMessagingTime']);
 Route::get("/disable", [RecipientController::class, 'disableMessaging']);
 Route::get("/enable", [RecipientController::class, 'enableMessaging']);

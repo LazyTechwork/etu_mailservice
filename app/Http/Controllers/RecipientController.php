@@ -33,7 +33,7 @@ class RecipientController extends Controller
         }
 
         if ($pushed) {
-            exec("./vendor/bin/envoy run deploy");
+            exec("./vendor/bin/envoy run deploy >> /dev/null");
         }
 
         return response('Got it!', 200);
