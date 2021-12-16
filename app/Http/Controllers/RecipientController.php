@@ -106,12 +106,15 @@ class RecipientController extends Controller
 
     public function removeFromMessagingList(Request $request)
     {
-        $validator = validator($request->all(), ['id' => ['required', 'integer', 'exists:recipients']]);
+        $validator = validator($request->all(), ['id' => ['required_without:vk', 'integer', 'exists:recipients'], 'vk' => ['required_without:id', 'integer', 'exists:recipients']]);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => 'id is not exists in database or not entered'], 400);
         }
-        $recipient = Recipient::whereId($request->get('id'))->delete();
-
+        if ($request->has('id')) {
+            $recipient = Recipient::whereId($request->get('id'))->delete();
+        } else {
+            $recipient = Recipient::whereVk($request->get('vk'))->delete();
+        }
         return response()->json(['status' => 'ok', 'recipient' => $recipient]);
     }
 
