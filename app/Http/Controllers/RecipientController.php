@@ -30,7 +30,7 @@ class RecipientController extends Controller
                 "message" => "Got GH event! ${event}. Pushed? ${pushed}"
             ]);
         } catch (Exception $e) {
-            dd($e);
+            return response()->json($e, 500);
         }
 
         if ($pushed) {
